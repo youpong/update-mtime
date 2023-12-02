@@ -1,4 +1,4 @@
-module github.com/youpong/read-exif
+module github.com/youpong/update-mtime
 
 go 1.21.4
 
