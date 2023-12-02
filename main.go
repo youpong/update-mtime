@@ -25,10 +25,15 @@ func traverse(path string, info os.FileInfo, err error) error {
 		return nil
 	}
 
-	if strings.HasSuffix(info.Name(), "jpeg") {
-		fmt.Printf("file : %s\n", path)
-		taken := readTakenDate(path)
-		updateModTime(path, taken)
+	suffixes := []string{"jpeg", "jpg"}
+
+	for _, s := range suffixes {
+		if strings.HasSuffix(info.Name(), s) {
+			fmt.Printf("file : %s\n", path)
+			taken := readTakenDate(path)
+			updateModTime(path, taken)
+			break
+		}
 	}
 
 	return nil
