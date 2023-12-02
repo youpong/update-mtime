@@ -21,12 +21,13 @@ func main() {
 		}
 	*/
 	// updateTime()
-	tm := readTakenDate()
-	updateTime(tm)
+	fname := "sample.jpeg"
+	tm := readTakenDate(fname)
+	updateTime(fname, tm)
 }
 
-func updateTime(mtime time.Time) {
-	if err := os.Chtimes("sample.jpeg", time.Time{}, mtime); err != nil {
+func updateTime(path string, mtime time.Time) {
+	if err := os.Chtimes(path, time.Time{}, mtime); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -40,10 +41,8 @@ func traverse(path string, info os.FileInfo, err error) error {
 	return nil
 }
 
-func readTakenDate() time.Time {
-	fname := "sample.jpeg"
-
-	f, err := os.Open(fname)
+func readTakenDate(path string) time.Time {
+	f, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
 	}
