@@ -14,6 +14,11 @@ import (
 // dry run/ run
 
 func main() {
+	f, err := os.OpenFile("update-mtime.log", os.O_RDWR|os.O_CREATE, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.SetOutput(f)
 
 	if err := filepath.Walk(".", traverse); err != nil {
 		fmt.Println(err)
