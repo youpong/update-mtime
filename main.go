@@ -56,7 +56,10 @@ func readTakenDate(path string) time.Time {
 		log.Fatal(err)
 	}
 
-	tm, _ := x.DateTime()
+	tm, err := x.DateTime()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return tm
 }
