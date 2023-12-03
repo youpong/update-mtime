@@ -14,6 +14,7 @@ import (
 // dry run/ run
 
 func main() {
+
 	if err := filepath.Walk(".", traverse); err != nil {
 		fmt.Println(err)
 	}
@@ -29,9 +30,9 @@ func traverse(path string, info os.FileInfo, err error) error {
 
 	for _, s := range suffixes {
 		if strings.HasSuffix(info.Name(), s) {
-			fmt.Printf("file : %s\n", path)
 			taken := readTakenDate(path)
 			updateModTime(path, taken)
+			log.Printf("%s: %v, %v", path, taken.Format(time.RFC3339), info.ModTime().Format(time.RFC3339))
 			break
 		}
 	}
