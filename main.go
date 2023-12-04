@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -11,21 +12,33 @@ import (
 	"github.com/rwcarlsen/goexif/exif"
 )
 
-// dry run/ run
+var dryRun bool
 
 func main() {
-	f, err := os.OpenFile("update-mtime.log", os.O_RDWR|os.O_CREATE, 0755)
+	var logFilename string
+	flag.StringVar(&logFilename, "l", "update-mtime.log", "Write log to filename")
+	flag.BoolVar(&dryRun, "d", false, "Write files to log that would be updated but do not update them")
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "usage: %s [OPTIONS] [DIR]\n", os.Args[0])
+		flag.PrintDefaults()
+	}
+	flag.Parse()
+
+	f, err := os.OpenFile(logFilename, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.SetOutput(f)
+
+	if dryRun {
+		log.Println("dry run")
+	}
 
 	if err := filepath.Walk(".", traverse); err != nil {
 		fmt.Println(err)
 	}
 }
 
-// FileInfo.ModTime time.Time
 func traverse(path string, info os.FileInfo, err error) error {
 	if info.IsDir() {
 		return nil
@@ -36,7 +49,9 @@ func traverse(path string, info os.FileInfo, err error) error {
 	for _, s := range suffixes {
 		if strings.HasSuffix(info.Name(), s) {
 			taken := readTakenDate(path)
-			updateModTime(path, taken)
+			if !dryRun {
+				updateModTime(path, taken)
+			}
 			log.Printf("%s: %v, %v", path, taken.Format(time.RFC3339), info.ModTime().Format(time.RFC3339))
 			break
 		}
