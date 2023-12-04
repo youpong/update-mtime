@@ -24,17 +24,29 @@ func main() {
 	}
 	flag.Parse()
 
-	f, err := os.OpenFile(logFilename, os.O_RDWR|os.O_CREATE, 0755)
+	f, err := os.OpenFile(logFilename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.SetOutput(f)
 
+	var dir string
+	args := flag.Args()
+	switch len(args) {
+	case 0:
+		dir = "."
+	case 1:
+		dir = args[0]
+	default:
+		flag.Usage()
+		return
+	}
+
 	if dryRun {
 		log.Println("dry run")
 	}
 
-	if err := filepath.Walk(".", traverse); err != nil {
+	if err := filepath.Walk(dir, traverse); err != nil {
 		fmt.Println(err)
 	}
 }
